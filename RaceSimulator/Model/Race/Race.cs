@@ -1,19 +1,20 @@
 namespace RaceSimulator.Model.Race;
 
+using Exception;
 using Vehicle;
 
 public class Race(int distance, RaceType raceType) {
     private readonly List<Vehicle> _members = [];
+    public RaceType RaceType { get; } = raceType;
 
     public void RegisterMember(Vehicle vehicle)
     {
-        //type check
-        if (raceType == RaceType.Air && vehicle is not AirVehicle) {
-            throw new Exception("Cannot register a race with a land vehicle");
+        if (RaceType == RaceType.Air && vehicle is not AirVehicle) {
+            throw new WrongVehicleForRaceException("Cannot register a land vehicle to an air race");
         }
 
-        if (raceType == RaceType.Land && vehicle is not LandVehicle) {
-            throw new Exception("Cannot register a race with an air vehicle");
+        if (RaceType == RaceType.Land && vehicle is not LandVehicle) {
+            throw new WrongVehicleForRaceException("Cannot register an air vehicle to a land race");
         }
             
         _members.Add(vehicle);
@@ -23,24 +24,19 @@ public class Race(int distance, RaceType raceType) {
     {
         if (distance < 1)
         {
-            throw new Exception("Distance must be greater than 0");
+            throw new InvalidRaceException("Distance must be greater than 0");
         }
     }
 
-    public void Start()
+    public SortedList<double, Vehicle> Start()
     {
-        this.Validate();
+        Validate();
         SortedList<double, Vehicle> participants = new SortedList<double, Vehicle>();
         foreach (Vehicle member in this._members) {
             var time = member.Run(distance);
             participants.Add(time, member);
         }
 
-        int i = 1;
-        foreach (KeyValuePair<double, Vehicle> participant in participants)
-        {
-            Console.WriteLine($"Место {i}: {participant.Value.Name}, время: {participant.Key}");
-            i++;
-        }
+        return participants;
     }
 }
