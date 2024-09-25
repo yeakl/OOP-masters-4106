@@ -2,7 +2,7 @@ namespace RaceSimulator.Model.Vehicle;
 
 public class PumpkinCoach: LandVehicle
 {
-    public override string Name => "Корета-тыква";
+    public override string Name => "Карета-тыква";
 
     protected override double Speed()
     {
