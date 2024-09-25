@@ -4,7 +4,7 @@ public class Broom: AirVehicle
 {
     protected override double AccelerationRate(int distance)
     {
-        return 5;
+        return (1 / distance) + Double.Pi;
     }
 
     public override string Name => "Метла";

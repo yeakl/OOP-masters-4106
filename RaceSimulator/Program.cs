@@ -22,6 +22,7 @@ class Program
         race.RegisterMember(flyingShip);
         race.RegisterMember(mortar);
         race.RegisterMember(walkingBoots);
+        race.RegisterMember(pumpkinCoach);
         
         race.Start();
     }

@@ -11,6 +11,14 @@ public class FlyingCarpet: AirVehicle
 
     protected override double AccelerationRate(int distance)
     {
-        return 1.75;
+        switch (distance)
+        {
+            case < 1000:
+                return 1;
+            case > 1000 and < 3000:
+                return 0.95;
+            default:
+                return 0.8;
+        }
     }
 }

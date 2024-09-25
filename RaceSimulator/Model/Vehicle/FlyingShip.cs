@@ -1,6 +1,6 @@
 namespace RaceSimulator.Model.Vehicle;
 
-class FlyingShip: AirVehicle
+public class FlyingShip: AirVehicle
 {
     public override string Name => "Летучий корабль";
 
@@ -11,6 +11,6 @@ class FlyingShip: AirVehicle
 
     protected override double AccelerationRate(int distance)
     {
-        return 2.05;
+        return (1 / distance) ^ 2;
     }
 }

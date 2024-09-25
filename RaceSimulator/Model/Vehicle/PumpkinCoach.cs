@@ -11,7 +11,7 @@ public class PumpkinCoach: LandVehicle
 
     protected override int RestTime(int stopIndex)
     {
-        return (int)1.5 * stopIndex;
+        return (int)(1.5 + stopIndex)^2;
     }
 
     protected override int TravelTimeUntilRest()

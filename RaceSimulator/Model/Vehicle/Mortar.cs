@@ -11,6 +11,6 @@ public class Mortar: AirVehicle
 
     protected override double AccelerationRate(int distance)
     {
-        return 1.55;
+        return 1 - 1/double.Log10(distance);
     }
 }
