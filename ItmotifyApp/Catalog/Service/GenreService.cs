@@ -10,17 +10,17 @@ public class GenreService
     public Genre CreateGenre(string name)
     {
         var genre = new Genre(name);
-        _genreRepository.AddGenre(genre);
+        _genreRepository.Add(genre);
         return genre;
     }
 
     public List<Genre> GetAllGenres()
     {
-        return _genreRepository.GetGenres();
+        return _genreRepository.GetAll();
     }
     
     public Genre GetGenreByIndex(int index)
     {
-        return _genreRepository.GetGenre(index);
+        return _genreRepository.GetByIndex(index);
     }
 }

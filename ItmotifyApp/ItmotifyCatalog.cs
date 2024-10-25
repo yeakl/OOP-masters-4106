@@ -1,5 +1,5 @@
+using ItmotifyApp.Catalog.Command;
 using ItmotifyApp.Catalog.Factory;
-using ItmotifyApp.Catalog.Model;
 using ItmotifyApp.Catalog.Service;
 
 namespace ItmotifyApp;
@@ -10,22 +10,22 @@ public class ItmotifyCatalog
     private readonly ArtistService _artistService = new();
     private readonly TrackService _trackService = new();
     private readonly AlbumService _albumService = new();
+    private readonly PlaylistService _playlistService = new();
 
     public void Run()
     {
         Initiialize();
-        Dictionary<int, string> commands = new Dictionary<int, string>()
+        var commands = new Dictionary<int, string>()
         {
-            { 0, "Search All" },
             { 1, "Search Albums" },
             { 2, "Search Artists" },
-            { 3, "Search Collections" },
+            { 3, "Search Playlists" },
             { 4, "Search Tracks" },
             { 5, "Add Track" },
             { 6, "Add Album" },
             { 7, "Add Genre" },
             { 8, "Add Artist" },
-            { 9, "Add Collection" },
+            { 9, "Add Playlist" },
             { 10, "List everything" },
         };
 
@@ -38,187 +38,37 @@ public class ItmotifyCatalog
         {
             Console.WriteLine("Выберите действие:");
             var option = Console.ReadLine();
-            if (int.TryParse(option, out int index))
+            if (!int.TryParse(option, out var index)) continue;
+            try
             {
-                switch (index)
-                {
-                    case 0:
-                        break;
-                    case 5:
-                        CreateTrack();
-                        break;
-                    case 6:
-                        CreateAlbum();
-                        break;
-                    case 7:
-                        CreateGenre();
-                        break;
-                    case 8:
-                        CreateArtist();
-                        break;
-                    case 10:
-                        ListEverything();
-                        break;
-                }
+                var command = ResolveCommand(index);
+                command.Execute();
+            }
+            catch (NotImplementedException)
+            {
+                Console.Error.WriteLine("Команда не найдена!");
             }
         }
     }
 
-    private void CreateGenre()
+    private ICommand ResolveCommand(int index)
     {
-        Console.WriteLine($"Введите название жанра:");
-        var input = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(input))
+        return index switch
         {
-            _genreService.CreateGenre(input);
-        }
+            1 => new SearchAlbums(_albumService),
+            2 => new SearchArtists(_artistService),
+            3 => new SearchPlaylists(_playlistService),
+            4 => new SearchTracks(_trackService),
+            5 => new CreateTrack(_artistService, _genreService, _albumService, _trackService),
+            6 => new CreateAlbum(_artistService, _albumService),
+            7 => new CreateGenre(_genreService),
+            8 => new CreateArtist(_artistService),
+            9 => new CreatePlaylist(_playlistService, _trackService),
+            10 => new ListCatalog(_artistService, _trackService, _albumService, _playlistService),
+            _ => throw new NotImplementedException()
+        };
     }
-
-    private void CreateArtist()
-    {
-        Console.WriteLine($"Введите имя/название артиста:");
-        var input = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(input))
-        {
-            _artistService.CreateArtist(input);
-        }
-    }
-
-    private void ListEverything()
-    {
-        Console.WriteLine("ALL ARTISTS: ");
-        foreach (var artist in _artistService.GetAllArtists())
-        {
-            Console.WriteLine(artist.Name);
-        }
-
-        Console.WriteLine("ALL TRACKS: ");
-        foreach (var track in _trackService.GetAllTracks())
-        {
-            Console.WriteLine($"{track.Artist.Name} - {track.Name} ({track.Genre.Name}, Album: {track.Album.Name})");
-        }
-
-        Console.WriteLine("ALL ALBUMS: ");
-        foreach (var album in _albumService.GetAllAlbums())
-        {
-            Console.WriteLine($"{album.Artist.Name} - {album.Name} ({album.Year})");
-        }
-    }
-
-    private void CreateTrack()
-    {
-        Console.WriteLine($"Введите название песни:");
-        var songName = Console.ReadLine();
-        if (string.IsNullOrEmpty(songName))
-        {
-            Console.Error.WriteLine("Название не может быть пустым");
-            return;
-        }
-
-        Console.WriteLine($"Выберите номер артиста из списка");
-        var artists = _artistService.GetAllArtists();
-        var index = 0;
-        foreach (var artist in artists)
-        {
-            Console.WriteLine($"{index}: {artist.Name}");
-            ++index;
-        }
-
-        var artistIndex = Convert.ToInt32(Console.ReadLine());
-        var pickedArtist = artists.ElementAt(artistIndex);
-
-
-        Console.WriteLine($"Выберите номер жанра из списка");
-        var genres = _genreService.GetAllGenres();
-        index = 0;
-        foreach (var genre in genres)
-        {
-            Console.WriteLine($"{index}: {genre.Name}");
-            ++index;
-        }
-
-        var genreIndex = Convert.ToInt32(Console.ReadLine());
-        var pickedGenre = genres.ElementAt(genreIndex);
-
-        Console.WriteLine("Выберите номер альбома из списка или введите N для создания альбома");
-        var albums = _albumService.GetAllAlbums();
-        index = 0;
-        foreach (var album in albums)
-        {
-            Console.WriteLine($"{index}: {album.Artist.Name} - {album.Name} ({album.Year})");
-            ++index;
-        }
-
-        var input = Console.ReadLine();
-        Album? pickedAlbum;
-
-        if (input == "N")
-        {
-            //create Album
-            pickedAlbum = CreateAlbum(pickedArtist);
-        }
-        else
-        {
-            int.TryParse(input, out int albumIndex);
-            pickedAlbum = albums.ElementAt(albumIndex);
-        }
-
-        if (pickedAlbum == null)
-        {
-            Console.Error.WriteLine("Не смог создать альбом");
-            return;
-        }
-
-        var track = _trackService.CreateTrack(songName, pickedAlbum, pickedGenre);
-        _albumService.AddTrack(track, pickedAlbum);
-        return;
-    }
-
-    private void CreateAlbum()
-    {
-        Console.WriteLine($"Введите название альбома:");
-        var albumName = Console.ReadLine();
-        if (string.IsNullOrEmpty(albumName))
-        {
-            Console.Error.WriteLine("Название не может быть пустым");
-            return;
-        }
-
-        Console.WriteLine($"Введите год выхода альбома");
-        Int32.TryParse(Console.ReadLine(), out int albumYear);
-
-
-        Console.WriteLine($"Выберите номер артиста из списка");
-        var artists = _artistService.GetAllArtists();
-        var index = 0;
-        foreach (var artist in artists)
-        {
-            Console.WriteLine($"{index}: {artist.Name}");
-            ++index;
-        }
-
-        var artistIndex = Convert.ToInt32(Console.ReadLine());
-        var pickedArtist = artists.ElementAt(artistIndex);
-
-        _albumService.CreateAlbum(albumName, albumYear, pickedArtist);
-    }
-
-    private Album? CreateAlbum(Artist artist)
-    {
-        Console.WriteLine($"Введите название альбома:");
-        var albumName = Console.ReadLine();
-        if (string.IsNullOrEmpty(albumName))
-        {
-            Console.Error.WriteLine("Название не может быть пустым");
-            return null;
-        }
-
-        Console.WriteLine($"Введите год выхода альбома");
-        Int32.TryParse(Console.ReadLine(), out int albumYear);
-
-        return _albumService.CreateAlbum(albumName, albumYear, artist);
-    }
-
+    
     private void Initiialize()
     {
         new GenreFactory(_genreService).CreateFromNames(["Metalcore", "Deathcore", "Metal", "Pop", "R&B", "Rap"]);
@@ -261,6 +111,15 @@ public class ItmotifyCatalog
             "Hurt",
             _albumService.GetAlbumByIndex(3),
             _genreService.GetGenreByIndex(4)
+        );
+
+        _playlistService.CreatePlaylist(
+            "Nice",
+            [
+                _trackService.GetTrackByIndex(0),
+                _trackService.GetTrackByIndex(1),
+                _trackService.GetTrackByIndex(2),
+            ]
         );
     }
 }
