@@ -6,7 +6,7 @@ namespace ItmotifyApp.Catalog.Service;
 public class PlaylistService
 {
     private readonly PlaylistRepository _playlistRepository = new();
-    
+
     public Playlist CreatePlaylist(string name, List<Track> tracks)
     {
         var playlist = new Playlist(name, tracks);
@@ -18,7 +18,7 @@ public class PlaylistService
     {
         return _playlistRepository.GetAll();
     }
-    
+
     public List<Playlist> Search(string term)
     {
         List<Playlist> playlists = [];

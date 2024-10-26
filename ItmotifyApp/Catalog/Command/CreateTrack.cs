@@ -14,7 +14,7 @@ public class CreateTrack(
         var songName = InputHandler.InputName("песни");
         var pickedArtist = InputHandler.InputArtist(artistService);
         var pickedGenre = InputHandler.InputGenre(genreService);
-        
+
         Console.WriteLine("Выберите номер альбома из списка или введите N для создания альбома");
         var albums = albumService.GetAllAlbums();
         var index = 0;

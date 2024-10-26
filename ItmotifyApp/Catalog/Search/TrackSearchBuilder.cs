@@ -7,7 +7,7 @@ public class TrackSearchBuilder
     private string? _name;
     private Artist? _artist;
     private Genre? _genre;
-    
+
     public TrackSearchBuilder WithName(string term)
     {
         _name = term;

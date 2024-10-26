@@ -9,7 +9,7 @@ public abstract class BaseRepository<T> where T : ICatalogItem
     public void Add(T item) => _items.Add(item);
     public List<T> GetAll() => _items;
     public T GetByIndex(int index) => _items.ElementAt(index);
-    
+
     public List<T> FindByName(string name)
     {
         List<T> items = [];

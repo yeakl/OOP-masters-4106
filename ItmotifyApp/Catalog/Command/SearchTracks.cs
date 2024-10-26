@@ -4,7 +4,8 @@ using ItmotifyApp.Catalog.UI;
 
 namespace ItmotifyApp.Catalog.Command;
 
-public class SearchTracks(TrackService trackService, ArtistService artistService, GenreService genreService) : InputCommand, ICommand
+public class SearchTracks(TrackService trackService, ArtistService artistService, GenreService genreService)
+    : InputCommand, ICommand
 {
     public void Execute()
     {
@@ -13,35 +14,41 @@ public class SearchTracks(TrackService trackService, ArtistService artistService
             { 1, "Название" },
             { 2, "Исполнитель" },
             { 3, "Название и исполнитель" },
-            { 4, "Название и жанр"}
+            { 4, "Название и жанр" }
         };
-        
+
         Console.WriteLine("Выберите тип поиска");
 
         foreach (var option in options)
         {
             Console.WriteLine($"[{option.Key}] : {option.Value}");
         }
-        
+
         int.TryParse(Console.ReadLine(), out int inputOption);
         var searchBuilder = new TrackSearchBuilder();
         TrackSearchForm form = new();
         switch (inputOption)
         {
-            case 1: form = SearchByName(searchBuilder); break;
-            case 2: form = SearchByArtist(searchBuilder);
+            case 1:
+                form = SearchByName(searchBuilder);
                 break;
-            case 3: form = SearchByNameAndArtist(searchBuilder); break;
-            case 4: form = SearchByNameAndGenre(searchBuilder);
+            case 2:
+                form = SearchByArtist(searchBuilder);
+                break;
+            case 3:
+                form = SearchByNameAndArtist(searchBuilder);
+                break;
+            case 4:
+                form = SearchByNameAndGenre(searchBuilder);
                 break;
         }
-      
+
 
         var tracks = trackService.FullSearch(form);
         Console.WriteLine($"Найдено треков: {tracks.Count}");
         CatalogItemRenderer.Render(tracks);
     }
-    
+
     private TrackSearchForm SearchByName(TrackSearchBuilder builder)
     {
         var input = InputHandler.SearchTerm();

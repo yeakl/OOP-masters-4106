@@ -5,7 +5,8 @@ namespace ItmotifyApp.Catalog.Command;
 
 public class SearchAlbums(AlbumService albumService) : InputCommand, ICommand
 {
-    private InputHandler _handler = new ();
+    private InputHandler _handler = new();
+
     public void Execute()
     {
         var input = InputHandler.SearchTerm();

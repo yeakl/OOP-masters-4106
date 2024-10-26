@@ -31,7 +31,7 @@ public class ItmotifyCatalog
 
         foreach (var command in commands)
         {
-            Console.WriteLine($"{command.Key}: {command.Value}");
+            Console.WriteLine($"[{command.Key}]: {command.Value}");
         }
 
         while (true)

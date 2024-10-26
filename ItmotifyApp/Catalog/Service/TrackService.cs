@@ -14,7 +14,7 @@ public class TrackService
         _trackRepository.Add(track);
         return track;
     }
-    
+
     public List<Track> GetAllTracks() => _trackRepository.GetAll();
 
     public List<Track> FullSearch(TrackSearchForm searchForm)
@@ -45,7 +45,7 @@ public class TrackService
 
         return search;
     }
-    
+
     public Track GetTrackByIndex(int index)
     {
         return _trackRepository.GetByIndex(index);

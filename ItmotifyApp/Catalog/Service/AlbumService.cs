@@ -6,7 +6,7 @@ namespace ItmotifyApp.Catalog.Service;
 public class AlbumService
 {
     private readonly AlbumRepository _albumRepository = new();
-    
+
     public Album CreateAlbum(string name, int year, Artist artist)
     {
         var album = new Album(artist, name, year);
@@ -23,7 +23,7 @@ public class AlbumService
     {
         return _albumRepository.GetByIndex(index);
     }
-    
+
     public void AddTrack(Track track, Album album)
     {
         album.Tracks.Add(track);

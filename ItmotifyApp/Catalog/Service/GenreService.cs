@@ -6,7 +6,7 @@ namespace ItmotifyApp.Catalog.Service;
 public class GenreService
 {
     private readonly GenreRepository _genreRepository = new();
-    
+
     public Genre CreateGenre(string name)
     {
         var genre = new Genre(name);
@@ -18,7 +18,7 @@ public class GenreService
     {
         return _genreRepository.GetAll();
     }
-    
+
     public Genre GetGenreByIndex(int index)
     {
         return _genreRepository.GetByIndex(index);

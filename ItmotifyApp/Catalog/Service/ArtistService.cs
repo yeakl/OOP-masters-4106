@@ -6,7 +6,7 @@ namespace ItmotifyApp.Catalog.Service;
 public class ArtistService
 {
     private readonly ArtistRepository _artistRepository = new();
-    
+
     public Artist CreateArtist(string name)
     {
         var artist = new Artist(name);
@@ -23,7 +23,7 @@ public class ArtistService
     {
         return _artistRepository.GetByIndex(index);
     }
-    
+
     public List<Artist> Search(string term)
     {
         List<Artist> artists = [];

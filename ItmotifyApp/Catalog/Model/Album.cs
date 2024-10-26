@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace ItmotifyApp.Catalog.Model;
 
-public class Album: ICatalogItem
+public class Album : ICatalogItem
 {
     public readonly Artist Artist;
     public string Name { get; }
