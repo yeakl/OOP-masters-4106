@@ -4,7 +4,11 @@ using ItmotifyApp.Catalog.UI;
 
 namespace ItmotifyApp.Catalog.Command;
 
-public class ListCatalog(ArtistService artistService, TrackService trackService, AlbumService albumService, PlaylistService playlistService): ICommand
+public class ListCatalog(
+    ArtistService artistService,
+    TrackService trackService,
+    AlbumService albumService,
+    PlaylistService playlistService) : ICommand
 {
     public void Execute()
     {
@@ -13,16 +17,16 @@ public class ListCatalog(ArtistService artistService, TrackService trackService,
         var albums = albumService.GetAllAlbums();
         var playlists = playlistService.GetAllPlaylists();
 
-        Console.WriteLine("ALL ARTISTS: ");
+        Console.WriteLine("ВСЕ АРТИСТЫ: ");
         CatalogItemRenderer.Render(artists);
 
-        Console.WriteLine("ALL TRACKS: ");
+        Console.WriteLine("ВСЕ ТРЕКИ: ");
         CatalogItemRenderer.Render(tracks);
 
-        Console.WriteLine("ALL ALBUMS: ");
+        Console.WriteLine("ВСЕ АЛЬБОМЫ: ");
         CatalogItemRenderer.Render(albums);
-        
-        Console.WriteLine("ALL PLAYLISTS: ");
+
+        Console.WriteLine("ВСЕ ПЛЕЙЛИСТЫ: ");
         CatalogItemRenderer.Render(playlists);
     }
 }

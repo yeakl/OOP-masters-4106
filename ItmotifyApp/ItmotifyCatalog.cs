@@ -36,8 +36,12 @@ public class ItmotifyCatalog
 
         while (true)
         {
-            Console.WriteLine("Выберите действие:");
+            Console.WriteLine("Выберите действие или введите q для выхода:");
             var option = Console.ReadLine();
+            if (option == "q")
+            {
+                break;
+            }
             if (!int.TryParse(option, out var index)) continue;
             try
             {
@@ -58,7 +62,7 @@ public class ItmotifyCatalog
             1 => new SearchAlbums(_albumService),
             2 => new SearchArtists(_artistService),
             3 => new SearchPlaylists(_playlistService),
-            4 => new SearchTracks(_trackService),
+            4 => new SearchTracks(_trackService, _artistService, _genreService),
             5 => new CreateTrack(_artistService, _genreService, _albumService, _trackService),
             6 => new CreateAlbum(_artistService, _albumService),
             7 => new CreateGenre(_genreService),

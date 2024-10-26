@@ -5,7 +5,7 @@ namespace ItmotifyApp.Catalog.Model;
 public class Album: ICatalogItem
 {
     public readonly Artist Artist;
-    public string Name { get; set; }
+    public string Name { get; }
     public string FullName() => $"{Artist.Name} - {Name} ({Year})";
     public List<Track> Tracks { get; set; } = [];
     public readonly int Year;

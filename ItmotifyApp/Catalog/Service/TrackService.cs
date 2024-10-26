@@ -1,5 +1,6 @@
 using ItmotifyApp.Catalog.Model;
 using ItmotifyApp.Catalog.Repository;
+using ItmotifyApp.Catalog.Search;
 
 namespace ItmotifyApp.Catalog.Service;
 
@@ -16,20 +17,35 @@ public class TrackService
     
     public List<Track> GetAllTracks() => _trackRepository.GetAll();
 
-    public List<Track> Search(string term)
+    public List<Track> FullSearch(TrackSearchForm searchForm)
     {
-        List<Track> tracks = [];
-        foreach (var track in _trackRepository.GetAll())
+        List<Track> search = [];
+        if (searchForm is { Name: not null, Artist: null })
         {
-            if (track.Name.Contains(term, StringComparison.CurrentCultureIgnoreCase))
-            {
-                tracks.Add(track);
-            }
+            search.AddRange(_trackRepository.FindByName(searchForm.Name));
+            return search;
         }
 
-        return tracks;
-    }
+        if (searchForm is { Name: not null, Artist: not null })
+        {
+            search.AddRange(_trackRepository.FindByNameAndArtist(searchForm.Artist, searchForm.Name));
+            return search;
+        }
 
+        if (searchForm is { Name: null, Artist: not null })
+        {
+            search.AddRange(_trackRepository.FindByArtist(searchForm.Artist));
+            return search;
+        }
+
+        if (searchForm is { Name: not null, Genre: not null })
+        {
+            search.AddRange(_trackRepository.FindByNameAndGenre(searchForm.Name, searchForm.Genre));
+        }
+
+        return search;
+    }
+    
     public Track GetTrackByIndex(int index)
     {
         return _trackRepository.GetByIndex(index);
