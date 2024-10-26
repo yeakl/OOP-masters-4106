@@ -7,7 +7,7 @@ public class Album : ICatalogItem
     public readonly Artist Artist;
     public string Name { get; }
     public string FullName() => $"{Artist.Name} - {Name} ({Year})";
-    public List<Track> Tracks { get; set; } = [];
+    public List<Track> Tracks { get; } = [];
     public readonly int Year;
 
     public Album(Artist artist, string name, int year)
