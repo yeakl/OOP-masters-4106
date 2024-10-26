@@ -52,6 +52,10 @@ public class ItmotifyCatalog
             {
                 Console.Error.WriteLine("Команда не найдена!");
             }
+            catch (InvalidDataException)
+            {
+                Console.Error.WriteLine("Некорректный ввод, начните заново");
+            }
         }
     }
 
