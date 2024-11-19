@@ -14,7 +14,7 @@ public class DbStockRepository(StoreDbContext context): IStockRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateStockAsync(List<Stock>? stockToAdd, List<Stock>? stockToUpdate)
+    public async Task UpdateStockAsync(List<Stock>? stockToAdd = null, List<Stock>? stockToUpdate = null)
     {
         if (stockToAdd is not null && stockToAdd.Any())
         {
@@ -53,7 +53,8 @@ public class DbStockRepository(StoreDbContext context): IStockRepository
         return storeCode;
     }
 
-    public async Task<List<AffordableProductsDto>> GetAffordableProductsByMoneyAmount(string storeCode, decimal moneyAmount)
+    public async Task<List<AffordableProductsDto>> GetAffordableProductsByMoneyAmount(string storeCode,
+        decimal moneyAmount)
     {
         return await context.Stocks
             .Where(ps => ps.StoreCode == storeCode)
@@ -64,6 +65,11 @@ public class DbStockRepository(StoreDbContext context): IStockRepository
             })
             .Where(dto => dto.Amount > 0)
             .ToListAsync();
+    }
+    
+    public async Task<List<Stock>> GetStockByProductSkusAsync(string storeCode, List<string> productSkus)
+    {
+        return await context.Stocks.Where(s => productSkus.Contains(s.ProductSku) && s.StoreCode == storeCode && s.Quantity > 0).ToListAsync();
     }
 
     /*public async Task<Stock?> LoadProductByStoreAndProductAsync(string storeCode, int productId)

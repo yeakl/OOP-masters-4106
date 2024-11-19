@@ -40,4 +40,9 @@ public class FileStockRepository: IStockRepository
     {
         throw new NotImplementedException();
     }
+
+    public Task<List<Stock>> GetStockByProductSkusAsync(string storeCode, List<string> productSkus)
+    {
+        throw new NotImplementedException();
+    }
 }

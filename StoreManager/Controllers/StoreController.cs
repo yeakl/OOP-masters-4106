@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StoreManager.BLL;
+using StoreManager.BLL.Exceptions;
 using StoreManager.Dto;
 using StoreManager.Models;
 
@@ -31,14 +32,14 @@ public class StoreController(
         {
             return new BadRequestResult();
         }
-        
+
         //todo: тут еще надо проверить, что продукты существуют
-        
+
         await storeService.AddProductsToStore(store, stockRequest);
         return Ok("Товары загружены");
     }
-    
-        
+
+
     [HttpGet("stock/cheapest/{sku}")]
     public async Task<IActionResult> FindCheapestProduct([FromRoute] string sku)
     {
@@ -62,5 +63,28 @@ public class StoreController(
 
         var items = await storeService.GetAffordableProductsByMoneyAmount(store, money);
         return Ok(items);
+    }
+
+    [HttpPost("{code}/stock/buy")]
+    public async Task<IActionResult> BuyProductsInStore([FromRoute] string code,
+        [FromBody] List<PurchaseRequestDto> purchaseRequest)
+    {
+        var store = await storeService.GetStoreByCode(code);
+        if (store == null)
+        {
+            return new NotFoundResult();
+        }
+
+        try
+        {
+            var sum = await storeService.Buy(store, purchaseRequest);
+            return Ok(sum);
+        }
+        catch (Exception exception) when (exception is InsufficientProductsInStoreException
+                                              or UnavailableProductsInStoreException)
+        {
+            return new BadRequestObjectResult(new
+                { exception.Message, ExceptionType = exception.GetType().Name, });
+        }
     }
 }

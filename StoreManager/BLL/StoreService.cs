@@ -1,3 +1,4 @@
+using StoreManager.BLL.Exceptions;
 using StoreManager.DAL.Contracts;
 using StoreManager.Dto;
 using StoreManager.Models;
@@ -63,5 +64,32 @@ public class StoreService(
     public async Task<List<AffordableProductsDto>> GetAffordableProductsByMoneyAmount(Store store, decimal amount)
     {
         return await stockRepository.GetAffordableProductsByMoneyAmount(store.Code, amount);
+    }
+
+    public async Task<decimal> Buy(Store store, List<PurchaseRequestDto> purchaseItems)
+    {
+        var productSkusInPurchase = purchaseItems.Select(p => p.ProductSku).ToList();
+        var purchaseProductsInStore = await stockRepository.GetStockByProductSkusAsync(store.Code, productSkusInPurchase);
+        if (purchaseProductsInStore.Count < productSkusInPurchase.Count)
+        {
+            throw new UnavailableProductsInStoreException("В магазине есть не все продукты");
+        }
+
+        decimal total = 0;
+
+        foreach (var purchase in purchaseItems)
+        {
+            var storeProduct = purchaseProductsInStore.Single(p => p.ProductSku == purchase.ProductSku);
+            if (purchase.Quantity > storeProduct.Quantity)
+            {
+                throw new InsufficientProductsInStoreException("В магазине не хватает товаров");
+            }
+            
+            total += storeProduct.Price * purchase.Quantity;
+            storeProduct.Quantity -= purchase.Quantity;
+        }
+        
+        await stockRepository.UpdateStockAsync(stockToUpdate: purchaseProductsInStore);
+        return total;
     }
 }
