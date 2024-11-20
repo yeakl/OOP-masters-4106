@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using StoreManager.BLL;
 using StoreManager.BLL.Exceptions;
 using StoreManager.Dto;
-using StoreManager.Models;
 
 namespace StoreManager.Controllers;
 
@@ -10,7 +9,6 @@ namespace StoreManager.Controllers;
 [Route("api/[controller]")]
 public class StoreController(
     StoreService storeService,
-    ProductService productService,
     StockService stockService
 ) : ControllerBase
 {
@@ -82,6 +80,22 @@ public class StoreController(
         }
         catch (Exception exception) when (exception is InsufficientProductsInStoreException
                                               or UnavailableProductsInStoreException)
+        {
+            return new BadRequestObjectResult(new
+                { exception.Message, ExceptionType = exception.GetType().Name, });
+        }
+    }
+
+    [HttpPost("stock/combo/cheapest")]
+    public async Task<IActionResult> FindStoreWithCheapestCombination(
+        [FromBody] List<PurchaseRequestDto> purchaseRequest)
+    {
+        try
+        {
+            var store = await storeService.FindStoreWithCheapestProductCombination(purchaseRequest);
+            return Ok(store);
+        }
+        catch (ProductCombinationUnavailableException exception)
         {
             return new BadRequestObjectResult(new
                 { exception.Message, ExceptionType = exception.GetType().Name, });

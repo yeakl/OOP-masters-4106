@@ -72,9 +72,35 @@ public class DbStockRepository(StoreDbContext context): IStockRepository
         return await context.Stocks.Where(s => productSkus.Contains(s.ProductSku) && s.StoreCode == storeCode && s.Quantity > 0).ToListAsync();
     }
 
-    /*public async Task<Stock?> LoadProductByStoreAndProductAsync(string storeCode, int productId)
+    public async Task<string?> FindCheapestStoreCodeWithProductCombination(List<PurchaseRequestDto> productCombination)
     {
-        var stock = await context.Stocks.FirstOrDefaultAsync(stock => stock.ProductId == productId && stock.StoreCode == storeCode);
-        return stock;
-    }*/
+        var allSkus = productCombination.Select(s => s.ProductSku).ToList();
+        var productQuantityMap = productCombination.ToDictionary(p => p.ProductSku, p => p.Quantity);
+
+        var stockData = await context.Stocks
+            .Where(stock => allSkus.Contains(stock.ProductSku))
+            .ToListAsync();
+
+        var storesWithSufficientQuantitiesAndTotalSum = stockData
+            .GroupBy(stock => stock.StoreCode)
+            .Where(group =>
+                allSkus.All(sku =>
+                        group.Any(stock => stock.ProductSku == sku) &&
+                        group.Any(stock => stock.ProductSku == sku && stock.Quantity >= productQuantityMap[sku])
+                )
+            )
+            .Select(group => new
+            {
+                StoreCode = group.Key,
+                TotalSum = group
+                    .Where(stock => productQuantityMap.ContainsKey(stock.ProductSku))
+                    .Sum(stock =>
+                            productQuantityMap[stock.ProductSku] * stock.Price
+                    )
+            })
+            .OrderBy(store => store.TotalSum)
+            .FirstOrDefault();
+        
+        return storesWithSufficientQuantitiesAndTotalSum?.StoreCode;
+    }   
 }

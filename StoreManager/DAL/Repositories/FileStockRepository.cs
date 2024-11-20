@@ -4,7 +4,7 @@ using StoreManager.Models;
 
 namespace StoreManager.DAL.Repositories;
 
-public class FileStockRepository: IStockRepository
+public class FileStockRepository : IStockRepository
 {
     public Task AddStockAsync(List<Stock> stocks)
     {
@@ -42,6 +42,11 @@ public class FileStockRepository: IStockRepository
     }
 
     public Task<List<Stock>> GetStockByProductSkusAsync(string storeCode, List<string> productSkus)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<string?> FindCheapestStoreCodeWithProductCombination(List<PurchaseRequestDto> productCombination)
     {
         throw new NotImplementedException();
     }

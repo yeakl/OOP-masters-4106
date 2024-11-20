@@ -92,4 +92,23 @@ public class StoreService(
         await stockRepository.UpdateStockAsync(stockToUpdate: purchaseProductsInStore);
         return total;
     }
+
+    public async Task<Store> FindStoreWithCheapestProductCombination(List<PurchaseRequestDto> products)
+    {
+        var storeCode = await stockRepository.FindCheapestStoreCodeWithProductCombination(products);
+        if (storeCode == null)
+        {
+            throw new ProductCombinationUnavailableException(
+                "Не получится купить комбинацию товаров ни в одном магазине");
+        }
+
+        var store = await repository.GetStoreByCodeAsync(storeCode);
+        if (store == null)
+        {
+            throw new ProductCombinationUnavailableException(
+                "Не получится купить комбинацию товаров ни в одном магазине");
+        }
+
+        return store;
+    }
 }
