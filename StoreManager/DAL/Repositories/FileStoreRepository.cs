@@ -7,17 +7,15 @@ namespace StoreManager.DAL.Repositories;
 public class FileStoreRepository: IStoreRepository
 {
     private readonly string _filePath;
-    public FileStoreRepository(string filePath)
+    private readonly IFileHandler _fileHandler;
+    
+    public FileStoreRepository(string filePath, IFileHandler fileHandler)
     {
         _filePath = filePath;
-        EnsureExistsOrCreateFile(filePath);
+        _fileHandler = fileHandler;
+        _fileHandler.EnsureFileExistsOrCreate(filePath);
     }
 
-    private void EnsureExistsOrCreateFile(string filePath)
-    {
-        if (!File.Exists(filePath)) File.WriteAllText(filePath, "[]");
-    }
-    
     public async Task AddStoreAsync(Store store)
     {
         var allStores = await GetAllStoresAsync();
@@ -26,7 +24,8 @@ public class FileStoreRepository: IStoreRepository
             allStores.Add(store);
         }
 
-        await WriteStoresAsync(allStores);
+        var json = JsonSerializer.Serialize(allStores);
+        await _fileHandler.WriteToFileAsync(_filePath, json);
     }
 
     public async Task<Store?> GetStoreByCodeAsync(string code)
@@ -34,13 +33,7 @@ public class FileStoreRepository: IStoreRepository
         var allStores = await GetAllStoresAsync();
         return allStores.FirstOrDefault(s => s.Code == code);
     }
-
-    private async Task WriteStoresAsync(List<Store> stores)
-    {
-        var json = JsonSerializer.Serialize(stores);
-        await File.WriteAllTextAsync(_filePath, json);
-    }
-
+    
     private async Task<List<Store>> GetAllStoresAsync()
     {
         var json = await File.ReadAllTextAsync(_filePath);

@@ -3,6 +3,7 @@ using StoreManager.BLL;
 using StoreManager.DAL.Contracts;
 using StoreManager.DAL.Infrastructure;
 using StoreManager.DAL.Repositories;
+using StoreManager.DAL.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +25,10 @@ if (builder.Configuration["Storage"] == "db")
 }
 else
 {
-    builder.Services.AddScoped<IStoreRepository>(_ => new FileStoreRepository("DAL/Data/store.json"));
-    builder.Services.AddScoped<IStockRepository>(_ => new FileStockRepository("DAL/Data/stock.json"));
-    builder.Services.AddScoped<IProductRepository>(_ => new FileProductRepository("DAL/Data/product.json"));
+    builder.Services.AddScoped<IFileHandler, JsonFileHandler>();
+    builder.Services.AddScoped<IStoreRepository>(_ => new FileStoreRepository("DAL/data/store.json", _.GetRequiredService<IFileHandler>()));
+    builder.Services.AddScoped<IStockRepository>(_ => new FileStockRepository("DAL/data/stock.json", _.GetRequiredService<IFileHandler>()));
+    builder.Services.AddScoped<IProductRepository>(_ => new FileProductRepository("DAL/data/product.json", _.GetRequiredService<IFileHandler>()));
 }
 
 builder.Services.AddScoped<StoreService>();

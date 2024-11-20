@@ -7,16 +7,13 @@ namespace StoreManager.DAL.Repositories;
 public class FileProductRepository: IProductRepository
 {
     private readonly string _filePath;
+    private readonly IFileHandler _fileHandler;
    
-    public FileProductRepository(string filePath)
+    public FileProductRepository(string filePath, IFileHandler fileHandler)
     {
         _filePath = filePath;
-        EnsureExistsOrCreateFile(filePath);
-    }
-
-    private void EnsureExistsOrCreateFile(string filePath)
-    {
-        if (!File.Exists(filePath)) File.WriteAllText(filePath, "[]");
+        _fileHandler = fileHandler;
+        _fileHandler.EnsureFileExistsOrCreate(filePath);
     }
     
     public async Task AddProductAsync(Product product)
@@ -27,18 +24,13 @@ public class FileProductRepository: IProductRepository
             allProducts.Add(product);
         }
 
-        await WriteProductsAsync(allProducts);
+        var json = JsonSerializer.Serialize(allProducts);
+        await _fileHandler.WriteToFileAsync(_filePath, json);
     }
 
     private async Task<List<Product>> GetProductsAsync()
     {
         var json = await File.ReadAllTextAsync(_filePath);
         return JsonSerializer.Deserialize<List<Product>>(json) ?? new List<Product>();
-    }
-
-    private async Task WriteProductsAsync(List<Product> products)
-    {
-        var json = JsonSerializer.Serialize(products);
-        await File.WriteAllTextAsync(_filePath, json);
     }
 }
