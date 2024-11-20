@@ -13,11 +13,21 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
-builder.Services.AddDbContext<StoreDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IStoreRepository, DbStoreRepository>();
-builder.Services.AddScoped<IStockRepository, DbStockRepository>();
-builder.Services.AddScoped<IProductRepository, DbProductRepository>();
+//todo: можно попробовать сделать класс конфигурации и разнести
+if (builder.Configuration["Storage"] == "db")
+{
+    builder.Services.AddDbContext<StoreDbContext>(options =>
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.Services.AddScoped<IStoreRepository, DbStoreRepository>();
+    builder.Services.AddScoped<IStockRepository, DbStockRepository>();
+    builder.Services.AddScoped<IProductRepository, DbProductRepository>();
+}
+else
+{
+    builder.Services.AddScoped<IStoreRepository>(_ => new FileStoreRepository("DAL/Data/store.json"));
+    builder.Services.AddScoped<IStockRepository>(_ => new FileStockRepository("DAL/Data/stock.json"));
+    builder.Services.AddScoped<IProductRepository>(_ => new FileProductRepository("DAL/Data/product.json"));
+}
 
 builder.Services.AddScoped<StoreService>();
 builder.Services.AddScoped<ProductService>();
