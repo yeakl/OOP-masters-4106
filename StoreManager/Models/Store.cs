@@ -1,8 +1,8 @@
 namespace StoreManager.Models;
 
-public class Store
+public class Store(string code, string name, string address)
 {
-    public required string Code { get; set; }
-    public string Name { get; set; }
-    public string Address { get; set; }
+    public string Code { get; init; } = code;
+    public string Name { get; init; } = name;
+    public string Address { get; init; } = address;
 }

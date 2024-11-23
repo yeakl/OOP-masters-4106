@@ -1,13 +1,13 @@
 namespace StoreManager.Models;
 
-public class Stock
+public class Stock(string productSku, string storeCode, int quantity, decimal price)
 {
-    public required string ProductSku { get; set; }
-    public required string StoreCode { get; set; }
-    public int Quantity { get; set; }
-    public decimal Price { get; set; }
-    public Store Store { get; }
-    public Product Product { get; }
+    public string ProductSku { get; init; } = productSku;
+    public string StoreCode { get; init; } = storeCode;
+    public int Quantity { get; private set; } = quantity;
+    public decimal Price { get; private set; } = price;
+    public Store? Store { get; }
+    public Product? Product { get; }
     
     public Stock UpdateQuantity(int quantity)
     {

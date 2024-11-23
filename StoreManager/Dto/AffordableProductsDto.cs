@@ -2,6 +2,6 @@ namespace StoreManager.Dto;
 
 public class AffordableProductsDto
 {
-    public string ProductSku { get; set; }
-    public int Amount { get; set; }
+    public required string ProductSku { get; set; }
+    public required int Amount { get; set; }
 }

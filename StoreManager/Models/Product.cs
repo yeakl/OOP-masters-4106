@@ -1,7 +1,7 @@
 namespace StoreManager.Models;
 
-public class Product
+public class Product(string sku, string name)
 {
-    public required string Sku { get; set; }
-    public required string Name { get; set; }
+    public string Sku { get; init; } = sku;
+    public string Name { get; init; } = name;
 }

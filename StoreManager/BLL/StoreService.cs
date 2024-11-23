@@ -7,8 +7,7 @@ namespace StoreManager.BLL;
 
 public class StoreService(
     IStoreRepository repository,
-    IStockRepository stockRepository,
-    IProductRepository productRepository
+    IStockRepository stockRepository
 )
 {
     public async Task<Store?> GetStoreByCode(string code)
@@ -16,15 +15,14 @@ public class StoreService(
         var store = await repository.GetStoreByCodeAsync(code);
         return store;
     }
-    
+
     public async Task AddStoreAsync(StoreDto storeDto)
     {
-        var store = new Store
-        {
-            Code = storeDto.Code,
-            Name = storeDto.Name,
-            Address = storeDto.Address
-        };
+        var store = new Store(
+            storeDto.Code,
+            storeDto.Name,
+            storeDto.Address
+        );
 
         await repository.AddStoreAsync(store);
     }
@@ -33,28 +31,30 @@ public class StoreService(
     {
         var productsInStock = await stockRepository.GetStockInStoreAsync(store.Code);
         var productSkusInStock = productsInStock.Select(p => p.ProductSku).ToList();
-        
+
         var productsToAdd = new List<Stock>();
         var productsToUpdate = new List<Stock>();
-        
+
         foreach (var stock in storeStockRequestDto)
         {
             if (!productSkusInStock.Contains(stock.ProductSku))
             {
-                var newProductInStock = new Stock
-                {
-                    ProductSku = stock.ProductSku,
-                    Quantity = stock.Quantity,
-                    Price = stock.Price,
-                    StoreCode = store.Code
-                };
+                var newProductInStock = new Stock(
+                    stock.ProductSku,
+                    store.Code,
+                    stock.Quantity,
+                    stock.Price
+                );
                 productsToAdd.Add(newProductInStock);
             }
             else
             {
                 var productInStock = productsInStock.FirstOrDefault(p => p.ProductSku == stock.ProductSku);
-                productInStock.UpdateQuantity(stock.Quantity).UpdatePrice(stock.Price);
-                productsToUpdate.Add(productInStock);
+                if (productInStock is not null)
+                {
+                    productInStock.UpdateQuantity(stock.Quantity).UpdatePrice(stock.Price);
+                    productsToUpdate.Add(productInStock);
+                }
             }
         }
 
@@ -69,7 +69,8 @@ public class StoreService(
     public async Task<decimal> Buy(Store store, List<PurchaseRequestDto> purchaseItems)
     {
         var productSkusInPurchase = purchaseItems.Select(p => p.ProductSku).ToList();
-        var purchaseProductsInStore = await stockRepository.GetStockByProductSkusAsync(store.Code, productSkusInPurchase);
+        var purchaseProductsInStore =
+            await stockRepository.GetStockByProductSkusAsync(store.Code, productSkusInPurchase);
         if (purchaseProductsInStore.Count < productSkusInPurchase.Count)
         {
             throw new UnavailableProductsInStoreException("В магазине есть не все продукты");
@@ -84,11 +85,11 @@ public class StoreService(
             {
                 throw new InsufficientProductsInStoreException("В магазине не хватает товаров");
             }
-            
+
             total += storeProduct.Price * purchase.Quantity;
-            storeProduct.Quantity -= purchase.Quantity;
+            storeProduct.UpdateQuantity(-1 * purchase.Quantity);
         }
-        
+
         await stockRepository.UpdateStockAsync(stockToUpdate: purchaseProductsInStore);
         return total;
     }

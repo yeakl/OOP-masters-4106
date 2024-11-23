@@ -8,10 +8,10 @@ public class ProductService(IProductRepository repository)
 {
     public async Task Add(ProductCreateDto productCreateDto)
     {
-        var product = new Product {
-            Sku = productCreateDto.Sku,
-            Name = productCreateDto.Name,
-        };
+        var product = new Product(
+            productCreateDto.Sku,
+            productCreateDto.Name
+        );
         
        await repository.AddProductAsync(product);
     }
