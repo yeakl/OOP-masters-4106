@@ -19,7 +19,7 @@ public class FileStoreRepository: IStoreRepository
     public async Task AddStoreAsync(Store store)
     {
         var allStores = await GetAllStoresAsync();
-        if (!allStores.Exists(s => s.Name == store.Name))
+        if (!allStores.Exists(s => s.Code == store.Code))
         {
             allStores.Add(store);
         }
