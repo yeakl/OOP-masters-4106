@@ -14,7 +14,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
-//todo: можно попробовать сделать класс конфигурации и разнести
 if (builder.Configuration["Storage"] == "db")
 {
     builder.Services.AddDbContext<StoreDbContext>(options =>

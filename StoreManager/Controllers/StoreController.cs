@@ -30,9 +30,7 @@ public class StoreController(
         {
             return new BadRequestResult();
         }
-
-        //todo: тут еще надо проверить, что продукты существуют
-
+        
         await storeService.AddProductsToStore(store, stockRequest);
         return Ok("Товары загружены");
     }
